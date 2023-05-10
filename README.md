@@ -31,11 +31,7 @@ fp@gmail.com
 fp123
 python manage.py runserver *.*.*.*:8040
 ```
-3. Run the demo
 
-You can use seed in this repository to run RCAfuzz.
-
-You can use inputs in this repository to run RCA.
 
 
 
