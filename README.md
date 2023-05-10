@@ -14,6 +14,7 @@ cd ..
 ```
 
 2.Download the conti demo framework and setup the web server
+
 ```
 git clone https://github.com/zyw-200/conti_afl_framework-master-master
 cd conti_afl_framework-master-master
@@ -32,7 +33,9 @@ python manage.py runserver *.*.*.*:8040
 ```
 
 3. Run the demo
+
 You can use seed in this repository to run RCAfuzz.
+
 You can use inputs in this repository to run RCA.
 
 
