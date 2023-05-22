@@ -17,9 +17,9 @@ tar xvf afl-latest.tgz
 mv afl-2.52b afl-fuzz
 cd afl-fuzz
 patch -p1 < ${AURORA_GIT_DIR}/crash_exploration/crash_exploration.patch
-patch -p1 < ../../RCA_v1/jingquan-filter.patch
-cd ../../aurora/root_cause_analysis
-patch -p1 < ../../RCA_v1/jingquan-analyzer.patch
+#patch -p1 < ../../RCA_v1/jingquan-filter.patch
+#cd ../../aurora/root_cause_analysis
+#patch -p1 < ../../RCA_v1/jingquan-analyzer.patch
 cd $EVAL_DIR/afl-fuzz
 make -j
 cd ..
