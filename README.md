@@ -7,6 +7,8 @@ The following commands show how to use RCA_v1 for the use-after-free bug of mrub
 1.Installation
 
 ```
+mkdir conti-demo-framework
+cd conti-demo-framework
 git clone https://github.com/gejingquan/RCA_v1
 cd RCA_v1
 ./RCA_v1_installation.sh
