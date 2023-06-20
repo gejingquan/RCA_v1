@@ -19,7 +19,8 @@ cd afl-fuzz
 patch -p1 < ${AURORA_GIT_DIR}/crash_exploration/crash_exploration.patch
 patch -p1 < ../../RCA_v1/jingquan-filter.patch
 cd ../../aurora
-patch -p1 < ../../RCA_v1/RCA_conti_demo.patch
+patch -p1 < ../../RCA_v1/0001-gejingquan-update-1.patch
+patch -p1 < ../../RCA_v1/0001-gejingquan-update-2.patch
 cd $EVAL_DIR/afl-fuzz
 make -j
 cd ..

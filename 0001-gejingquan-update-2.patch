@@ -1,0 +1,25 @@
+From f7461e934ba4fa50cfe71a76266c04277139147a Mon Sep 17 00:00:00 2001
+From: gejingquan <jingquan.ge@ntu.edu.sg>
+Date: Tue, 20 Jun 2023 13:46:46 +0800
+Subject: [PATCH] gejingquan update 2
+
+---
+ tracing/scripts/tracing.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tracing/scripts/tracing.py b/tracing/scripts/tracing.py
+index d887bfa..b63f961 100755
+--- a/tracing/scripts/tracing.py
++++ b/tracing/scripts/tracing.py
+@@ -137,7 +137,7 @@ def create_dir(path: str) -> None:
+ 
+ def remove_tmp_dir() -> None:
+     """Delete temporary directory if TMP_PATH appears to be safe"""
+-    if not(len(TMP_PATH) > 5 and TMP_PATH.startswith("/tmp/")):
++    if not(len(TMP_PATH) > 5 and TMP_PATH.startswith("/home/fuzzing_user/tmp/")):
+         logger.critical(f"TMP PATH might be not what you expect; skipping deletion - path is {TMP_PATH}")
+         return
+     logger.info(f"Deleting temporary directory {TMP_PATH}")
+-- 
+2.40.1
+

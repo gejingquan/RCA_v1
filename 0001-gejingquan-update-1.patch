@@ -1,0 +1,70 @@
+From 388a432ec918e8eb336cf9cf832abb0b7fd338a8 Mon Sep 17 00:00:00 2001
+From: gejingquan <jingquan.ge@ntu.edu.sg>
+Date: Fri, 2 Jun 2023 00:03:28 +0800
+Subject: [PATCH] gejingquan update 1
+
+---
+ .../trace_analysis/src/predicate_analysis.rs  | 23 ++++++++++++-------
+ tracing/scripts/tracing.py                    |  2 +-
+ 2 files changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/root_cause_analysis/trace_analysis/src/predicate_analysis.rs b/root_cause_analysis/trace_analysis/src/predicate_analysis.rs
+index b2c1981..be4abe2 100644
+--- a/root_cause_analysis/trace_analysis/src/predicate_analysis.rs
++++ b/root_cause_analysis/trace_analysis/src/predicate_analysis.rs
+@@ -27,24 +27,31 @@ impl PredicateAnalyzer {
+     }
+ 
+     fn evaluate_predicate(trace_analyzer: &TraceAnalyzer, mut predicate: Predicate) -> Predicate {
+-        let true_positives = trace_analyzer
++        let crash_false = trace_analyzer
+             .crashes
+             .as_slice()
+             .par_iter()
+             .map(|t| t.instructions.get(&predicate.address))
+             .filter(|i| predicate.execute(i))
+-            .count() as f64
+-            / trace_analyzer.crashes.len() as f64;
+-        let true_negatives = trace_analyzer
++            .count() as f64;
++        let non_crash_false = trace_analyzer
+             .non_crashes
+             .as_slice()
+             .par_iter()
+             .map(|t| t.instructions.get(&predicate.address))
+             .filter(|i| !predicate.execute(i))
+-            .count() as f64
+-            / trace_analyzer.non_crashes.len() as f64;
+-
+-        predicate.score = (true_positives + true_negatives) / 2.0;
++            .count() as f64;
++
++        predicate.score = (crash_false + non_crash_false) / (trace_analyzer.crashes.len() as f64 + trace_analyzer.non_crashes.len() as f64);
++
++        // println!(
++            // "crash_false={}, non_crash_false={}, crash_len={}, non_crash_len={}, predicate_socre={}",
++			// crash_false,
++			// non_crash_false,
++            // trace_analyzer.crashes.len(),
++			// trace_analyzer.non_crashes.len(),
++			// predicate.score
++        // );
+ 
+         predicate
+     }
+diff --git a/tracing/scripts/tracing.py b/tracing/scripts/tracing.py
+index 0d4912f..d887bfa 100755
+--- a/tracing/scripts/tracing.py
++++ b/tracing/scripts/tracing.py
+@@ -18,7 +18,7 @@ PIN_TOOL = os.environ['PIN_ROOT'] + "/source/tools/AuroraTracer/obj-intel64/auro
+ 
+ ASAN_OPTIONS = "ASAN_OPTIONS=detect_leaks=0"
+ 
+-TMP_PATH = "/tmp/tm/"
++TMP_PATH = "/home/fuzzing_user/tmp/tm/"
+ PIN_TIMEOUT = 5 * 60
+ PARALLEL_PROCESSES = os.cpu_count()
+ 
+-- 
+2.40.1
+
