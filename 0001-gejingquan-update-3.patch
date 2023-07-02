@@ -1,0 +1,146 @@
+From 7e5aaa402c034877b1f62380ee93134c2091edf6 Mon Sep 17 00:00:00 2001
+From: gejingquan <jingquan.ge@ntu.edu.sg>
+Date: Sun, 2 Jul 2023 15:22:28 +0800
+Subject: [PATCH] gejingquan update 3
+
+---
+ .../root_cause_analysis/src/addr2line.rs      | 97 ++++++++++++++++++-
+ 1 file changed, 96 insertions(+), 1 deletion(-)
+
+diff --git a/root_cause_analysis/root_cause_analysis/src/addr2line.rs b/root_cause_analysis/root_cause_analysis/src/addr2line.rs
+index b4a84af..f34f08a 100644
+--- a/root_cause_analysis/root_cause_analysis/src/addr2line.rs
++++ b/root_cause_analysis/root_cause_analysis/src/addr2line.rs
+@@ -4,12 +4,22 @@ use std::fs::read_to_string;
+ 
+ use std::process::Command;
+ use structopt::StructOpt;
++use std::fs::File;
++use std::io::{BufRead, BufReader, BufWriter, Result, Write};
++use std::path::Path;
++use std::fs;
+ 
+ use root_cause_analysis::config::Config;
+ use root_cause_analysis::monitor::executable;
+ use root_cause_analysis::utils::{parse_hex, write_file};
+ 
+ fn addr2line_args(config: &Config, address: usize) -> Vec<String> {
++	let args = format!(
++        "-e {} -a 0x{:x} -f -C -s -i -p",
++        executable(config),
++        address - config.load_offset
++    );
++	//println!("Jingquan in main(): args={:?}",args);
+     format!(
+         "-e {} -a 0x{:x} -f -C -s -i -p",
+         executable(config),
+@@ -33,6 +43,7 @@ fn addr2line(config: &Config, address: usize) -> String {
+         .to_string()
+ }
+ 
++
+ fn read_trace_file(config: &Config) -> String {
+     match config.debug_trace {
+         true => format!("{}/seed_dump.txt", config.eval_dir),
+@@ -78,13 +89,97 @@ fn merge(lines: &Vec<String>, map: &HashMap<usize, String>) -> String {
+         .collect()
+ }
+ 
++
++fn replace_semicolon_with_space(source_file_path: &str, target_file_path: &str) -> Result<()> {
++    let source_file = File::open(source_file_path)?;
++    let reader = BufReader::new(source_file);
++
++    let target_file = File::create(target_file_path)?;
++    let mut writer = BufWriter::new(target_file);
++
++    for line in reader.lines() {
++        let line = line?;
++        let replaced_line = line.replace(';', " ");
++
++        writeln!(writer, "{}", replaced_line)?;
++    }
++
++    Ok(())
++}
++
++
++fn is_file_exists(file_path: &str) -> bool {
++    let path = Path::new(file_path);
++    path.exists() && path.is_file()
++}
++
++
+ fn main() {
+     let config = Config::from_args();
++	//println!("Jingquan in main(): config={:?}",config);
++
++
++	let file_path = read_trace_file(&config);
++    if is_file_exists(&file_path) {
++        println!("ranked_predicates.txt exist.");
++    } else {
++        println!("ranked_predicates.txt doesn't exist.");
++		let source_path = format!("{}/scores_linear.csv", config.eval_dir);
++		println!("source_path={}",source_path);
++		if let Err(err) = replace_semicolon_with_space(&source_path, &file_path) {
++			eprintln!("Error: {}", err);
++		} else {
++			println!("Replace over!");
++		}
++    }
++
++
++    let file = File::open(read_trace_file(&config)).expect("Failed to open input file");
++    let reader = BufReader::new(file);
++    let mut lines: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
++
++    lines.sort_by(|a, b| {
++        let a_elements: Vec<&str> = a.split_whitespace().collect();
++        let b_elements: Vec<&str> = b.split_whitespace().collect();
++        let a_second_element = a_elements[1].parse::<f64>().unwrap();
++        let b_second_element = b_elements[1].parse::<f64>().unwrap();
++        b_second_element.partial_cmp(&a_second_element).unwrap()
++    });
++
++
++    let filtered_lines: Vec<String> = lines
++        .into_iter()
++        .filter(|line| {
++            let elements: Vec<&str> = line.split_whitespace().collect();
++            let second_element = elements[1].parse::<f64>().unwrap();
++            second_element > 0.5
++        })
++        .collect();
++
++
++    let mut output_file = File::create(read_trace_file(&config)).expect("Failed to create output file");
++    for line in &filtered_lines {
++        writeln!(output_file, "{}", line).expect("Failed to write to output file");
++    }
++
++
++
+ 
+     let output_vec = lines_as_vec(&config);
++	//println!("Jingquan in main(): output_vec={:?}",&output_vec[..5]);	
++
++
++	
+     let addresses = unique_addresses(&output_vec);
++	//println!("Jingquan in main(): addresses={:?}",addresses.iter().take(5).collect::<Vec<_>>());		
++	
+     let address_src_map = map_address_to_src(&config, &addresses);
++    // for (key, value) in &address_src_map {
++        // println!("Jingquan in main(), address_src_map= Key: {}, Value: {}", key, value);
++    // }	
++	
+     let output: String = merge(&output_vec, &address_src_map);
+-
++	//println!("Jingquan in main(): output={:?}",output);
++	
+     write_file(&out_file_path(&config), output);
+ }
+-- 
+2.41.0
+
