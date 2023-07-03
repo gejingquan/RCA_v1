@@ -22,6 +22,8 @@ cd ../../aurora
 patch -p1 < ../../RCA_v1/0001-gejingquan-update-1.patch
 patch -p1 < ../../RCA_v1/0001-gejingquan-update-2.patch
 patch -p1 < ../../RCA_v1/0001-gejingquan-update-3.patch
+patch -p1 < ../../RCA_v1/0001-gejingquan-update-4.patch
+patch -p1 < ../../RCA_v1/0001-gejingquan-update-5.patch
 cd $EVAL_DIR/afl-fuzz
 make -j
 cd ..

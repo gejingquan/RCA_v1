@@ -1,0 +1,52 @@
+From 4efdede762e434cb286d8fca8c30fab0eb09d405 Mon Sep 17 00:00:00 2001
+From: gejingquan <jingquan.ge@ntu.edu.sg>
+Date: Mon, 3 Jul 2023 12:17:30 +0800
+Subject: [PATCH] gejingquan update 5
+
+---
+ .../root_cause_analysis/src/addr2line.rs      | 26 +++++++++++--------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/root_cause_analysis/root_cause_analysis/src/addr2line.rs b/root_cause_analysis/root_cause_analysis/src/addr2line.rs
+index f34f08a..41667ce 100644
+--- a/root_cause_analysis/root_cause_analysis/src/addr2line.rs
++++ b/root_cause_analysis/root_cause_analysis/src/addr2line.rs
+@@ -120,20 +120,24 @@ fn main() {
+ 
+ 
+ 	let file_path = read_trace_file(&config);
+-    if is_file_exists(&file_path) {
+-        println!("ranked_predicates.txt exist.");
+-    } else {
+-        println!("ranked_predicates.txt doesn't exist.");
+-		let source_path = format!("{}/scores_linear.csv", config.eval_dir);
+-		println!("source_path={}",source_path);
+-		if let Err(err) = replace_semicolon_with_space(&source_path, &file_path) {
+-			eprintln!("Error: {}", err);
+-		} else {
+-			println!("Replace over!");
+-		}
++    if let Ok(metadata) = fs::metadata(&file_path) {
++        if metadata.is_file() && metadata.len() != 0 {
++            println!("ranked_predicates.txt exist. metadata.len={}",metadata.len());
++        }
++		else {
++			println!("ranked_predicates.txt doesn't exist.");
++			let source_path = format!("{}/scores_linear.csv", config.eval_dir);
++			println!("source_path={}",source_path);
++			if let Err(err) = replace_semicolon_with_space(&source_path, &file_path) {
++				eprintln!("Error: {}", err);
++			} else {
++				println!("Replace over!");
++			}
++		}	
+     }
+ 
+ 
++
+     let file = File::open(read_trace_file(&config)).expect("Failed to open input file");
+     let reader = BufReader::new(file);
+     let mut lines: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
+-- 
+2.41.0
+

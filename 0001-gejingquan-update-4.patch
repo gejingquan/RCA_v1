@@ -1,0 +1,56 @@
+From f70140f82e1accab0f4b21147170935cfb40c8a3 Mon Sep 17 00:00:00 2001
+From: gejingquan <jingquan.ge@ntu.edu.sg>
+Date: Sun, 2 Jul 2023 16:34:23 +0800
+Subject: [PATCH] gejingquan update 4
+
+---
+ .../trace_analysis/src/predicate_analysis.rs  | 23 +++++++------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
+
+diff --git a/root_cause_analysis/trace_analysis/src/predicate_analysis.rs b/root_cause_analysis/trace_analysis/src/predicate_analysis.rs
+index be4abe2..b2c1981 100644
+--- a/root_cause_analysis/trace_analysis/src/predicate_analysis.rs
++++ b/root_cause_analysis/trace_analysis/src/predicate_analysis.rs
+@@ -27,31 +27,24 @@ impl PredicateAnalyzer {
+     }
+ 
+     fn evaluate_predicate(trace_analyzer: &TraceAnalyzer, mut predicate: Predicate) -> Predicate {
+-        let crash_false = trace_analyzer
++        let true_positives = trace_analyzer
+             .crashes
+             .as_slice()
+             .par_iter()
+             .map(|t| t.instructions.get(&predicate.address))
+             .filter(|i| predicate.execute(i))
+-            .count() as f64;
+-        let non_crash_false = trace_analyzer
++            .count() as f64
++            / trace_analyzer.crashes.len() as f64;
++        let true_negatives = trace_analyzer
+             .non_crashes
+             .as_slice()
+             .par_iter()
+             .map(|t| t.instructions.get(&predicate.address))
+             .filter(|i| !predicate.execute(i))
+-            .count() as f64;
+-
+-        predicate.score = (crash_false + non_crash_false) / (trace_analyzer.crashes.len() as f64 + trace_analyzer.non_crashes.len() as f64);
+-
+-        // println!(
+-            // "crash_false={}, non_crash_false={}, crash_len={}, non_crash_len={}, predicate_socre={}",
+-			// crash_false,
+-			// non_crash_false,
+-            // trace_analyzer.crashes.len(),
+-			// trace_analyzer.non_crashes.len(),
+-			// predicate.score
+-        // );
++            .count() as f64
++            / trace_analyzer.non_crashes.len() as f64;
++
++        predicate.score = (true_positives + true_negatives) / 2.0;
+ 
+         predicate
+     }
+-- 
+2.41.0
+
