@@ -36,7 +36,7 @@ CC=$AFL_DIR/afl-gcc CFLAGS="-fsanitize=address -fsanitize-recover=address -ggdb 
 mv ./bin/mruby ../mruby_fuzz
 make clean
 CFLAGS="-ggdb -O0" make -e -j
-mv ./bin/mruby ../mruby_trace
+# mv ./bin/mruby ../mruby_trace
 cd $EVAL_DIR
 echo "@@" > arguments.txt
 
