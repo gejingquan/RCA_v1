@@ -17,13 +17,9 @@ tar xvf afl-latest.tgz
 mv afl-2.52b afl-fuzz
 cd afl-fuzz
 patch -p1 < ${AURORA_GIT_DIR}/crash_exploration/crash_exploration.patch
-patch -p1 < ../../RCA_v1/jingquan-filter.patch
-cd ../../aurora
-patch -p1 < ../RCA_v1/0001-gejingquan-update-1.patch
-patch -p1 < ../RCA_v1/0001-gejingquan-update-2.patch
-patch -p1 < ../RCA_v1/0001-gejingquan-update-3.patch
-patch -p1 < ../RCA_v1/0001-gejingquan-update-4.patch
-patch -p1 < ../RCA_v1/0001-gejingquan-update-5.patch
+#patch -p1 < ../../RCA_v1/jingquan-filter.patch
+#cd ../../aurora/root_cause_analysis
+#patch -p1 < ../../RCA_v1/jingquan-analyzer.patch
 cd $EVAL_DIR/afl-fuzz
 make -j
 cd ..
@@ -36,8 +32,9 @@ CC=$AFL_DIR/afl-gcc CFLAGS="-fsanitize=address -fsanitize-recover=address -ggdb 
 mv ./bin/mruby ../mruby_fuzz
 make clean
 CFLAGS="-ggdb -O0" make -e -j
-# mv ./bin/mruby ../mruby_trace
+mv ./bin/mruby ../mruby_trace
 cd $EVAL_DIR
+rm -rf mruby_fuzz mruby_trace
 echo "@@" > arguments.txt
 
 
